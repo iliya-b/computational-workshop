@@ -85,22 +85,23 @@ def secant(a, b, e):
     return x
 
 
-print('ЧИСЛЕННЫЕ МЕТОДЫ РЕШЕНИЯ НЕЛИНЕЙНЫХ УРАВНЕНИЙ')
-e = input('ε = ') ; e = float(eval(e)) # 0.000001
-A, B = eval(input('A, B = ')); A = float(A) ; B = float(B) # -5, 10
-N = 5
-print('A, B = ' , A, B)
-print('ε = ' , e)
+if __name__ == '__main__':
+    print('ЧИСЛЕННЫЕ МЕТОДЫ РЕШЕНИЯ НЕЛИНЕЙНЫХ УРАВНЕНИЙ')
+    e = input('ε = ') ; e = float(eval(e)) # 0.000001
+    A, B = eval(input('A, B = ')); A = float(A) ; B = float(B) # -5, 10
+    N = 5
+    print('A, B = ' , A, B)
+    print('ε = ' , e)
 
-intervals = separate (A, B, N)
+    intervals = separate (A, B, N)
 
-print(intervals, len(intervals))
+    print(intervals, len(intervals))
 
 
-algos = [bisection, newtone, modified_newtone, secant]
-for algo in algos:
-    print(algo.__name__)
-    for interval in intervals:
-        a, b = interval
-        approx = algo(a, b, e)
-        print(interval, approx, abs(f(approx)))
+    algos = [bisection, newtone, modified_newtone, secant]
+    for algo in algos:
+        print(algo.__name__)
+        for interval in intervals:
+            a, b = interval
+            approx = algo(a, b, e)
+            print(interval, approx, abs(f(approx)))
