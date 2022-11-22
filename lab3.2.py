@@ -18,7 +18,7 @@ def f_table(m, a, b):
 
 
 
-if __name__ == '__main__':
+def lab():
     print('Задача численного дифференцирования. Вариант 2.')
     print('f(x) = ln(1+x)')
 
@@ -53,7 +53,11 @@ if __name__ == '__main__':
             print("%.5f\t%.10f\t%.10f\t%.10f\t%.10f\t%.10f\t%.10f\t%.10f" % (x, y, der1, acc1, acc1/df(x),der2,acc2,acc2/ddf(x)))
         else:
             print("%.5f\t%.10f\t%.10f\t%.10f\t%.10f\t------------\t-------------\t-----------" % (x, y, der1, acc1, acc1/df(x)))
+    if input('Повтор [Y/n]: ').strip() == 'n':
+        return
+    lab()
 
 
 
-
+if __name__ == '__main__':
+    lab()
