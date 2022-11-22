@@ -51,7 +51,7 @@ def lagrange_polynome(table):
 
 
 def f(x):
-    return log(1 + x)
+    return x*x/(1+x*x)
 
 def f_table_random(m, a, b):
     X = []
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     m = int(input('Число значений в таблице m = '))
     a, b = float(input('Введите a: ')), float(input('Введите b: '))
-    base_table = f_table_random(m, a, b)
+    base_table = f_table(m, a, b)
     print_table(base_table)
 
     while True:
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         n = m + 1
         while n > m:
-            n = int(input('Степень многочлена (n < %d) n = ' % m))
+            n = int(input('Степень многочлена (n <= %d) n = ' % m))
 
         table = sorted(base_table, key=lambda point: abs(point[0] - x))[:n+1]
 

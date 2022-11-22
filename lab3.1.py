@@ -21,8 +21,6 @@ if __name__ == '__main__':
     a, b = float(input('Введите a: ')), float(input('Введите b: '))
     base_table = f_table(m, a, b)
     print_table(base_table)
-    X, Y = zip(*base_table)
-    inverse_table = list(zip(Y, X))
     while True:
         F = float(input('Значение в точке F = '))
 
@@ -34,6 +32,8 @@ if __name__ == '__main__':
 
 
         #### method 1
+        X, Y = zip(*base_table)
+        inverse_table = list(zip(Y, X))
         table = sorted(inverse_table, key=lambda point: abs(point[0] - F))[:n+1]
         P = newtone_polynome(table)
         X = P(F)
@@ -45,8 +45,8 @@ if __name__ == '__main__':
         P = newtone_polynome(table)
 
         x = bisection(lambda x: P(x) - F, a, b, e)
-        print("BISECTION x =", x)
-        print("BISECTION невязка", abs(F - f(x)))
+        print("БИСЕКЦИЯ x =", x)
+        print("БИСЕКЦИЯ невязка", abs(F - f(x)))
 
         if input('повтор? [N/y]: ') != 'y':
             break
