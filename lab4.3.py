@@ -7,19 +7,24 @@ from sympy.utilities.lambdify import lambdify
 x = Symbol('x', real=True)
 
 #### input function
-function_expression = x**2*cos(x)
+input_function = 1.27 * x**5 + 2.04 * x
+input_weight = 1
 ####
 
-f = lambdify(x, function_expression)
 
-def weight(t):
-    return 1
+function_expression = x-x + input_function # a workaround to allow pure constants as a functions
+weight_expression = x-x + input_weight
+weight= lambdify(x, weight_expression) 
+func = lambdify(x, function_expression)
+f = lambda x: weight(x) * func(x)
 
-def max_Df(n, a, b):
+def maxima(func, a, b):
+    res = minimize_scalar(lambda x: -abs(func(x)), bounds=(a,b), method='bounded')
+    return abs(func(res.x))
+
+def Df(n):
     deriv = function_expression.diff((x, n))
-    l = lambdify(x, deriv)
-    res = minimize_scalar(lambda x: -abs(l(x)), bounds=(a,b), method='bounded')
-    return abs(l(res.x))
+    return lambdify(x, deriv)
 
 print ("Приближённое вычисление интеграла по квадратурным формулам")
 print ("Вариант 2 J = ∫(%s)dx" % str(function_expression))
@@ -38,34 +43,35 @@ m = int(input("Число промежутков m = "))
 def left_rect(a, b, m):
     h = (b-a)/m
     return [a + (k-1)*h for k in range(1, m + 1)], [1 for k in range(1, m + 1)]
-left_rect.title = 'КФ левого прямоугольника'
+left_rect.title = 'КФ левых прямоугольника'
 left_rect.d = 0
 left_rect.C = 1/2
 
 def right_rect(a, b, m):
     h = (b-a)/m
     return [a + h + (k-1)*h for k in range(1, m + 1)], [1 for k in range(1, m + 1)]
-right_rect.title = 'КФ правого прямоугольника'
+right_rect.title = 'КФ правых прямоугольников'
 right_rect.d = 0
 right_rect.C = 1/2
 
 def middle_rect(a, b, m):
     h = (b-a)/m
-    return [a + h/2 + (k-1)*h for k in range(1, m + 1)], [1 for k in range(1, m + 1)]
-middle_rect.title = 'КФ среднего прямоугольника'
+    return [a - h/2 + h*k for k in range(1, m + 1)], [1 for k in range(1, m + 1)]
+middle_rect.title = 'КФ средних прямоугольников'
 middle_rect.d = 1
 middle_rect.C = 1/24
 
 def trapezoid(a, b, m):
     h = (b-a)/m
     return [a + k*h for k in range(0, m + 1)], [1/2, *[1 for k in range(1, m)], 1/2]
-trapezoid.title = 'КФ трапеции'
+trapezoid.title = 'КФ трапеций'
 trapezoid.d = 1
 trapezoid.C = 1/12
 
 def simpson(a, b, m):
     h = (b-a)/(2*m)
-    return [a + k*h for k in range(0, 2*m + 1)], [1/6, *[(2/3 if i % 2 == 1 else 1/3) for i in range(1, 2*m)], 1/6]
+    S = 1/6 * f(a) + 1/6*f(b) + 2/3 * sum([f(a + k*h) for k in range(1, 2*m, 2)]) + 1/3 * sum([f(a + k*h) for k in range(2, 2*m-1, 2)])
+    return S * (b-a)/m, None
 simpson.title = 'КФ Симпсона'
 simpson.d = 3
 simpson.C = 1/2880
@@ -73,16 +79,18 @@ simpson.C = 1/2880
 
 def calculate(f, method, a, b, m):
     nodes, weights = method(a, b, m)
+    if weights is None: # if the method makes last computations on its own (simpson)
+        return nodes
     S = 0
     for node, weight in zip(nodes, weights):
-        S += (b-a)/m*f(node)*weight 
-    return S
+        S += f(node)*weight 
+    return (b-a)/m*S
 
 def residue(d, C, a, b, m):
-    return  C*(b-a)*(((b-a)/m)**(d+1)) *  max_Df(d+1, a, b)
+    return  C*(b-a)*(((b-a)/m)**(d+1)) *  maxima(Df(d+1), a, b)
 
 
 for method in [left_rect, right_rect, middle_rect, trapezoid, simpson]:
     J1 =  calculate(f, method, a, b, m)
-    print("%s: J = %f,\n\tфактическая погрешность:\t%.20f\n\tотносительная погрешность:\t%.20f\n\tтеоретическая погрешность<=\t%.20f" % (method.title, J1, abs(J-J1), abs(abs(J-J1)/J), \
+    print("%s: J = %.20f,\n\tфактическая погрешность:\t%.20f\n\tотносительная погрешность:\t%.20f\n\tтеоретическая погрешность<=\t%.20f" % (method.title, J1, abs(J-J1), abs(abs(J-J1)/J) if J != 0 else 0, \
         residue(method.d, method.C, a, b, m)))
