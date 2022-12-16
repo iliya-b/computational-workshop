@@ -4,13 +4,14 @@ from sympy.functions import Abs
 from scipy.optimize import minimize_scalar
 from sympy.utilities.lambdify import lambdify
 
+IS_LAB4 = False
+
 x = Symbol('x', real=True)
 
 #### input function
-input_function = 1.27 * x**5 + 2.04 * x
+input_function =  sin(x)*1002*x**5 # 1.27 * x**5 + 2.04 * x
 input_weight = 1
 ####
-
 
 function_expression = x-x + input_function # a workaround to allow pure constants as a functions
 weight_expression = x-x + input_weight
@@ -33,12 +34,15 @@ print("Ввод пределов интегрирования")
 a =  float(input ('a = ')) # 0
 b =  float(input ('b = ')) # 1
 
-
 J, _ = integrate.quad(f, a, b)
 
 print('Точное значение J=%f' % J)
 
 m = int(input("Число промежутков m = "))
+if IS_LAB4:
+    l = int(input("l = "))
+else:
+    l = 1
 
 def left_rect(a, b, m):
     h = (b-a)/m
@@ -87,10 +91,24 @@ def calculate(f, method, a, b, m):
     return (b-a)/m*S
 
 def residue(d, C, a, b, m):
-    return  C*(b-a)*(((b-a)/m)**(d+1)) *  maxima(Df(d+1), a, b)
+    return  C*(b-a)*(((b-a)/(m))**(d+1)) *  maxima(Df(d+1), a, b)
 
 
-for method in [left_rect, right_rect, middle_rect, trapezoid, simpson]:
-    J1 =  calculate(f, method, a, b, m)
-    print("%s: J = %.20f,\n\tфактическая погрешность:\t%.20f\n\tотносительная погрешность:\t%.20f\n\tтеоретическая погрешность<=\t%.20f" % (method.title, J1, abs(J-J1), abs(abs(J-J1)/J) if J != 0 else 0, \
-        residue(method.d, method.C, a, b, m)))
+if IS_LAB4:
+    for method in [left_rect, right_rect, middle_rect, trapezoid, simpson]:
+        J1 =  calculate(f, method, a, b, m)
+        J2 =  calculate(f, method, a, b, m*l) 
+        R  = (J2-J1) / (2 ** (method.d + 1) - 1)
+        J_adj = J2 + R
+        print("[m] %s: J = %.20f,\n\tфактическая погрешность:\t%.20f\n\tотносительная погрешность:\t%.20f\n\tтеоретическая погрешность<=\t%.20f" % (method.title, J1, abs(J-J1), abs(abs(J-J1)/J) if J != 0 else 0, \
+            residue(method.d, method.C, a, b, m)))
+
+        print("[m*l] %s: J = %.20f,\n\tфактическая погрешность:\t%.20f\n\tотносительная погрешность:\t%.20f\n\tтеоретическая погрешность<=\t%.20f" % (method.title, J2, abs(J-J2), abs(abs(J-J2)/J) if J != 0 else 0, \
+            residue(method.d, method.C, a, b, m*l)))
+        print("[m*l+Runge] %s: J = %.20f,\n\tфактическая погрешность:\t%.20f\n\tотносительная погрешность:\t%.20f" % (method.title, J_adj, abs(J-J_adj), abs(abs(J-J_adj)/J) if J != 0 else 0))
+    
+else:
+    for method in [left_rect, right_rect, middle_rect, trapezoid, simpson]:
+        J1 =  calculate(f, method, a, b, m)
+        print("%s: J = %.20f,\n\tфактическая погрешность:\t%.20f\n\tотносительная погрешность:\t%.20f\n\tтеоретическая погрешность<=\t%.20f" % (method.title, J1, abs(J-J1), abs(abs(J-J1)/J) if J != 0 else 0, \
+            residue(method.d, method.C, a, b, m)))
