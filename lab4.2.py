@@ -46,9 +46,9 @@ def calculate(f, method, a, b):
     nodes, weights = method(a, b)
     S = 0
     for node, weight in zip(nodes, weights):
-        S += (b-a)*f(node)*weight 
-    return S
+        S += f(node)*weight 
+    return (b-a)*S
 
 for method in [left_rect, right_rect, middle_rect, trapezoid, simpson, three_over_eight]:
     J1 =  calculate(f, method, a, b)
-    print('%s: J = %f, погрешность: %f' % (method.title, J1, abs(J-J1)))
+    print('%s: J = %f, погрешность: %.20f' % (method.title, J1, abs(J-J1)))

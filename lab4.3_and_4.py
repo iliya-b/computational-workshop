@@ -4,12 +4,12 @@ from sympy.functions import Abs
 from scipy.optimize import minimize_scalar
 from sympy.utilities.lambdify import lambdify
 
-IS_LAB4 = False
+IS_LAB4 = True
 
 x = Symbol('x', real=True)
 
 #### input function
-input_function =  sin(x)*1002*x**5 # 1.27 * x**5 + 2.04 * x
+input_function =  sin(x)*2*x**5 # 1.27 * x**5 + 2.04 * x
 input_weight = 1
 ####
 
@@ -36,9 +36,10 @@ b =  float(input ('b = ')) # 1
 
 J, _ = integrate.quad(f, a, b)
 
-print('Точное значение J=%f' % J)
+print('Точное значение J=%.20f' % J)
 
 m = int(input("Число промежутков m = "))
+print("h=%f", (b-a) / m)
 if IS_LAB4:
     l = int(input("l = "))
 else:
@@ -98,7 +99,7 @@ if IS_LAB4:
     for method in [left_rect, right_rect, middle_rect, trapezoid, simpson]:
         J1 =  calculate(f, method, a, b, m)
         J2 =  calculate(f, method, a, b, m*l) 
-        R  = (J2-J1) / (2 ** (method.d + 1) - 1)
+        R  = (J2-J1) / (l ** (method.d + 1) - 1)
         J_adj = J2 + R
         print("[m] %s: J = %.20f,\n\tфактическая погрешность:\t%.20f\n\tотносительная погрешность:\t%.20f\n\tтеоретическая погрешность<=\t%.20f" % (method.title, J1, abs(J-J1), abs(abs(J-J1)/J) if J != 0 else 0, \
             residue(method.d, method.C, a, b, m)))
