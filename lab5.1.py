@@ -39,8 +39,8 @@ def nast_coeffs(weight, n, a, b):
     @lru_cache
     def m (k):
         # for fixed weight x ^ 0.25
-        ff = lambda x: x**(k+5/4)/(k+5/4)
-        return ff(b) - ff(a)
+        # ff = lambda x: x**(k+5/4)
+        # return (ff(b) - ff(a))/(k+5/4)
         S = integrate.quad(lambda x:weight(x) * x**k,a,b)[0]
         debug("μ(%d) = %.05f" % (k,S))
         return S
